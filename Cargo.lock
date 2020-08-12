@@ -6,7 +6,7 @@ version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7247bc6123f17b6582ed381ad90dd4e352aec04e74a6e88a627e4d82c1967154"
 dependencies = [
- "bastion-executor",
+ "bastion-executor 0.3.5",
  "lightproc",
  "once_cell",
 ]
@@ -36,6 +36,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6b602bfe940d21c130f3895acd65221e8a61270debe89d628b9cb4e3ccb8569b"
 
 [[package]]
+name = "arrayvec"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cff77d8686867eceff3105329d4698d96c2391c176d5d03adc90c7389162b5b8"
+
+[[package]]
 name = "async-mutex"
 version = "1.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -52,13 +58,12 @@ checksum = "f8aac770f1885fd7e387acedd76065302551364496e46b3dd00860b2f8359b9d"
 
 [[package]]
 name = "bastion"
-version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e348e2c04089600d3649cf485bb7dc2b07ab74e6740149b4acae0cac03f3b0fd"
+version = "0.4.3-alpha.0"
+source = "git+https://github.com/bastion-rs/bastion.git?branch=igni/affine_steal_sort#c35b089ee5e385ee0944f13659cff506c8f054f2"
 dependencies = [
  "anyhow",
  "async-mutex",
- "bastion-executor",
+ "bastion-executor 0.3.7-alpha.0",
  "futures",
  "futures-timer",
  "fxhash",
@@ -88,6 +93,27 @@ dependencies = [
  "libc",
  "lightproc",
  "num_cpus",
+ "pin-utils",
+ "winapi",
+]
+
+[[package]]
+name = "bastion-executor"
+version = "0.3.7-alpha.0"
+source = "git+https://github.com/bastion-rs/bastion.git?branch=igni/affine_steal_sort#c35b089ee5e385ee0944f13659cff506c8f054f2"
+dependencies = [
+ "arrayvec",
+ "bastion-utils",
+ "crossbeam-channel",
+ "crossbeam-epoch",
+ "crossbeam-utils",
+ "futures-timer",
+ "lazy_static",
+ "lever",
+ "libc",
+ "lightproc",
+ "num_cpus",
+ "once_cell",
  "pin-utils",
  "winapi",
 ]

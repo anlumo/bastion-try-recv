@@ -8,19 +8,21 @@ fn main() {
     Bastion::init();
     Bastion::start();
 
+    let mut receiver_ref = None;
+
     Bastion::supervisor(|sp| {
         let sp = sp.with_strategy(SupervisionStrategy::OneForOne);
-        let receiver_ref = sp
-            .children_ref(move |children| {
+        receiver_ref = Some(
+            sp.children_ref(move |children| {
                 children
                     .with_name("Receiver")
                     .with_exec(move |ctx| async move {
                         loop {
                             if let Some(msg) = ctx.try_recv().await {
                                 msg! { msg,
-                                    msg: DemoMessage => {
+                                    msg: DemoMessage =!> {
                                         eprintln!("DemoMessage!");
-                                        Bastion::stop();
+                                        answer!(ctx, 42u8).unwrap();
                                     };
                                     _:_ => panic!("Invalid message received");
                                 }
@@ -31,25 +33,28 @@ fn main() {
                     })
             })
             .elems()[0]
-            .addr();
-        sp.children_ref(move |children| {
-            children.with_name("Sender").with_exec(move |ctx| {
-                let receiver_ref = receiver_ref.clone();
-                async move {
-                    loop {
-                        lazy(|_| {
-                            eprintln!("Sending message");
-                            ctx.tell(&receiver_ref, DemoMessage).unwrap();
-                        })
-                        .await;
-                    }
-                    Ok(())
-                }
-            })
-        });
+                .clone(),
+        );
         sp
     })
     .unwrap();
+
+    run!(async {
+        msg! { receiver_ref
+        .unwrap()
+        .ask_anonymously(DemoMessage)
+        .unwrap()
+        .await
+        .unwrap(),
+            response: u8 => {
+                assert_eq!(response, 42);
+                eprintln!("Response = {:?}", response);
+            };
+            _:_ => panic!("Invalid answer received");
+        }
+    });
+
+    eprintln!("Blocking...");
 
     Bastion::block_until_stopped();
 }
